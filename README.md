@@ -1,8 +1,9 @@
-Github mirror gitea
+Sync GitHub to Gitea 
 ==================
 Sync all repository's (including private) from GitHub to Gitea you
 have access to with the given token.
 
+Flow
 - Github: Get all repo's you have access to (paginated)
 - Gitea: Add repo X
 - Gitea: Already exists? mirror-sync!
