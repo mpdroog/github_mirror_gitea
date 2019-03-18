@@ -14,7 +14,7 @@ cd github_mirror_gitea
 cp _config.example.php config.php
 vi config.php
 ...
-php index.php
+php index.php -v
 ```
 
 mirror not working?
