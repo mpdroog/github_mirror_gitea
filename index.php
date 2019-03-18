@@ -160,6 +160,7 @@ while ($next) {
 
     $res = Gitea::call("POST", "/api/v1/repos/migrate", [
       "clone_addr" => $repo["html_url"], //"https://github.com/".$repo["full_name"],
+      "mirror" => true,
       "private" => $repo["private"],
       "description" => $repo["description"],
       "repo_name" => $repo["name"],
@@ -172,6 +173,12 @@ while ($next) {
       echo " added\n";
       continue;
     }
+    if ($res["http"] === 403) {
+      echo " invalid key\n";
+      echo sprintf("ERROR: Invalid GITEA_TOKEN(%s), please update and try again!\n", GITEA_TOKEN);
+      die();
+    }
+
     if ($res["http"] === 409) {
       echo " exists, calling mirror-sync";
 
