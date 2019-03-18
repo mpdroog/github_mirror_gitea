@@ -19,3 +19,6 @@ php index.php -v
 
 mirror not working?
 Have a look in the logs, availably by default in `/var/lib/gitea/log/gitea.log`
+
+Dependencies
+Just PHP7 and cURL, nothing more.
