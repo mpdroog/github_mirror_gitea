@@ -16,3 +16,6 @@ vi config.php
 ...
 php index.php
 ```
+
+mirror not working?
+Have a look in the logs, availably by default in `/var/lib/gitea/log/gitea.log`
