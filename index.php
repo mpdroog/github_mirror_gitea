@@ -2,6 +2,9 @@
 require __DIR__ . "/_init.php";
 require __DIR__ . "/_config.php";
 
+$options = getopt("v");
+define("VERBOSE", isset($options["v"]));
+
 class Github {
   public static $ch = null;
 
@@ -140,18 +143,18 @@ while ($next) {
           $next = explode(";", $fwd)[0];             // strip rel off
           $next = substr($next, 1, strlen($next)-2); // strip <..> off
           $next = substr($next, strpos($next, ".com")+strlen(".com")); // strip github-url off
-          echo "pagination.next=$next\n";
+          if (VERBOSE) echo "pagination.next=$next\n";
         }
       }
     }
   }
 
   foreach ($repos["body"] as $repo) {
-    echo sprintf("github.com/%s private=%s fork=%s", $repo["full_name"], $repo["private"], $repo["fork"]);
+    if (VERBOSE) echo sprintf("github.com/%s private=%s fork=%s", $repo["full_name"], $repo["private"], $repo["fork"]);
     $ignore = false;
     foreach ($repo_ignore as $ign) {
       if (substr($repo["full_name"], 0, strlen($ign)) === $ign) {
-        echo " ignored!\n";
+        if (VERBOSE) echo " ignored!\n";
         $ignore = true;
         continue;
       }
@@ -170,7 +173,7 @@ while ($next) {
     ]);
 
     if ($res["http"] === 201) {
-      echo " added\n";
+      if (VERBOSE) echo " added\n";
       continue;
     }
     if ($res["http"] === 403) {
@@ -180,16 +183,17 @@ while ($next) {
     }
 
     if ($res["http"] === 409) {
-      echo " exists, calling mirror-sync";
+      if (VERBOSE) echo " exists, calling mirror-sync";
 
       $res = Gitea::call("POST", sprintf("/api/v1/repos/%s/%s/mirror-sync", OWNER, $repo["name"]));
       if ($res["http"] === 200) {
-        echo " done!\n";
+        if (VERBOSE) echo " done!\n";
         continue;
       }
     }
 
     echo " ERROR\n";
+    var_dump($repo);
     var_dump($res);
     echo "\n";
   }
