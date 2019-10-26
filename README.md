@@ -3,6 +3,9 @@ Sync GitHub to Gitea
 Sync all repository's (including private) from GitHub to Gitea you
 have access to with the given token.
 
+A super easy solution to use GitHub as your main platform and use
+Gitea as your backup.
+
 Flow
 - Github: Get all repo's you have access to (paginated)
 - Gitea: Add repo X
