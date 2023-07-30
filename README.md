@@ -7,6 +7,7 @@ A super easy solution to use GitHub as your main platform and use
 Gitea as your backup.
 
 Flow
+===================
 - Github: Get all repo's you have access to (paginated)
 - Gitea: Add repo X
 - Gitea: Already exists? mirror-sync!
@@ -20,6 +21,11 @@ vi config.php
 php index.php -v
 ```
 
+Create Github token: https://github.com/settings/tokens
+Create Gitea token: https://code.rootdev.nl/user/settings/applications
+
+Other
+===================
 mirror not working?
 Have a look in the logs, availably by default in `/var/lib/gitea/log/gitea.log`
 
