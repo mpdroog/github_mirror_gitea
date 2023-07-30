@@ -72,12 +72,13 @@ class Gitea {
     ];
     $res_headers = [];
 
-    curl_setopt($ch, CURLOPT_URL, sprintf("%s%s", GITEA_URL, $url));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $ok = 1;
+    $ok &= curl_setopt($ch, CURLOPT_URL, sprintf("%s%s", GITEA_URL, $url));
+    $ok &= curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    $ok &= curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    $ok &= curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($curl, $header) use (&$res_headers) {
+    $ok &= curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($curl, $header) use (&$res_headers) {
         $len = strlen($header);
         $header = explode(':', $header, 2);
         if (count($header) < 2) // ignore invalid headers
@@ -89,11 +90,17 @@ class Gitea {
           $res_headers[$name][] = trim($header[1]);
         return $len;
     });
-
     if (count($args) > 0) {
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($args));
+      $ok &= curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($args));
     }
+    if ($ok !== 1) user_error("curl_setopt failed");
+
     $res = curl_exec($ch);
+    if ($res === false) {
+        $err = curl_error($ch);
+        curl_close($ch);
+        user_error("curl_exec failed e=$err");
+    }
     $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 
@@ -104,10 +111,7 @@ class Gitea {
     $mime_json = "application/json";
     if (substr($contentType, 0, strlen($mime_json)) === $mime_json) {
         $res = json_decode($res, true);
-        return ["http" => $http, "body" => $res, "header" => $res_headers];
     }
-    //var_dump($http, $res_headers, $res, $url);
-    //trigger_error("Unexpected server response.content-type=$contentType");
     return [
       "http" => $http, "body" => $res, "header" => $res_headers
     ];
@@ -175,6 +179,10 @@ while ($next) {
     if ($res["http"] === 201) {
       if (VERBOSE) echo " added\n";
       continue;
+    }
+    if ($res["http"] === 401) {
+      echo " basic auth in front of Gitea?\n";
+      die();
     }
     if ($res["http"] === 403) {
       echo " invalid key\n";
